@@ -1,28 +1,37 @@
 #!/usr/bin/python
 
-import sys
+import sys, os, time
 import wx
 
 
-class DemoFrame(wx.Window):
-	def __init__(self, parent):
-		#wx.Frame.__init__(self, None, -1,
-		wx.Window.__init__(self, parent, -1,
-			#"wx.ListCtrl in wx.LC_REPORT mode",
-			size=(600,400))
+class MyListCtrl(wx.ListCtrl):
+	def __init__(self, parent, id):
+		wx.ListCtrl.__init__(self, parent, id, size=(600, 400), style=wx.LC_REPORT)
+		#wx.ListCtrl.__init__(self, parent, id, style=wx.LC_REPORT)
 
-		#self.list = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
-		#self.list = wx.ListCtrl(parent, -1, style=wx.LC_REPORT)
-		self.list = wx.ListCtrl(parent, -1, size=(600, 400), style=wx.LC_REPORT)
-		self.list.InsertColumn(0, "File")
-		self.list.InsertColumn(1, "Directory")
-		self.list.InsertColumn(2, "Permission")
-		self.list.InsertColumn(3, "Timestamp")
+		self.InsertColumn(0, "Name")
+		self.InsertColumn(1, "Directory")
+		self.InsertColumn(2, "Size")
+		self.InsertColumn(3, "Date Modified")
 
-		self.list.SetColumnWidth(0, 120)
-		self.list.SetColumnWidth(1, 120)
-		self.list.SetColumnWidth(2, 80)
-		self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
+		self.SetColumnWidth(0, 160)
+		self.SetColumnWidth(1, 300)
+		self.SetColumnWidth(2, 80)
+		#self.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
+		self.SetColumnWidth(3, 120)
+
+		self.set_value()
+
+
+	def set_value(self):
+		row = 0
+		files = os.listdir('.')
+		for file in files:
+			self.InsertStringItem(row, os.path.basename(file))
+			self.SetStringItem(row, 1, os.getcwd() + os.path.dirname(file))
+			self.SetStringItem(row, 2, str(os.path.getsize(file)))
+			self.SetStringItem(row, 3, time.ctime(os.path.getmtime(file)))
+			row += 1
 
 
 
@@ -98,8 +107,7 @@ class pyMainPanel(wx.Panel):
 		'''
 
 		panel = wx.Panel(self)
-		s = DemoFrame(panel)
-		#s.SetMinSize((600, 400))
+		mylist = MyListCtrl(panel, -1)
 		box = wx.BoxSizer(wx.HORIZONTAL)
 		box.Add(panel, 1, wx.EXPAND) #|wx.TOP)
 		#box.Fit(self)
