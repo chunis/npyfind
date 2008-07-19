@@ -114,15 +114,6 @@ class MyFrame(wx.Frame):
 	def onExit(self, event):	
 		self.Close()
 		
-	def onNotImplemented(self, name):	
-		wx.MessageBox('Sorry. Not implemented yet...', 
-				name, wx.OK | wx.ICON_INFORMATION, self)
-		
-	def onFind(self, event):	
-		self.onNotImplemented('Find')
-		
-	def onOpenDir(self, event):	
-		self.onNotImplemented('Open Dir')
 		
 
 class NPyFind(wx.App):
