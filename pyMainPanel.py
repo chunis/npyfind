@@ -8,16 +8,10 @@ class MyListCtrl(wx.ListCtrl):
 	def __init__(self, parent, id):
 		wx.ListCtrl.__init__(self, parent, id, style=wx.LC_REPORT)
 
-		self.InsertColumn(0, "Name")
-		self.InsertColumn(1, "Size")
-		self.InsertColumn(2, "Date Modified")
-		self.InsertColumn(3, "Directory")
-
-		self.SetColumnWidth(0, 160)
-		self.SetColumnWidth(1, 80)
-		self.SetColumnWidth(2, 160)
-		#self.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
-		self.SetColumnWidth(3, 300)
+		self.InsertColumn(0, "Name", width=160)
+		self.InsertColumn(1, "Size", format=wx.LIST_FORMAT_RIGHT, width=80)
+		self.InsertColumn(2, "Date Modified", format=wx.LIST_FORMAT_RIGHT, width=160)
+		self.InsertColumn(3, "Directory", width=300)
 
 		self.set_value()
 
@@ -27,7 +21,7 @@ class MyListCtrl(wx.ListCtrl):
 		files = os.listdir('.')
 		for file in files:
 			self.InsertStringItem(row, os.path.basename(file))
-			self.SetStringItem(row, 1, str(os.path.getsize(file)))
+			self.SetStringItem(row, 1, str(os.path.getsize(file)) + ' B')
 			self.SetStringItem(row, 2, time.ctime(os.path.getmtime(file)))
 			self.SetStringItem(row, 3, os.getcwd() + os.path.dirname(file))
 			row += 1
@@ -46,7 +40,7 @@ class pyMainPanel(wx.Panel):
 		mylist = MyListCtrl(self, -1)
 
 		mainbox = wx.BoxSizer(wx.VERTICAL)
-		mainbox.Add(search_argu_box, 0)
+		mainbox.Add(search_argu_box, 0, wx.EXPAND)
 		mainbox.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.TOP|wx.BOTTOM, 10)
 		mainbox.Add(mylist, 1, wx.EXPAND)
 
@@ -56,18 +50,33 @@ class pyMainPanel(wx.Panel):
 
 	
 	def config_argu_ui(self):
-		set_co_b = wx.Button(self, label='Find Files In')
-		set_sti_b = wx.Button(self, label='Browse')
-		auto_search_b = wx.Button(self, label='Files Type')
+		find_st = wx.StaticText(self, label='Find Files In')
+		name_st = wx.StaticText(self, label='File Specification')
+		type_st = wx.StaticText(self, label='File Type')
 
-		self.Bind(wx.EVT_BUTTON, self.onFind, set_co_b)
-		self.Bind(wx.EVT_BUTTON, self.onBrowse, set_sti_b)
-		self.Bind(wx.EVT_BUTTON, self.onFilesType, auto_search_b)
+		dir_tc = wx.TextCtrl(self, -1)
+		brws_btn = wx.Button(self, label='Browse')
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		hbox.Add(dir_tc, 1)
+		hbox.Add(brws_btn)
+
+		name_tc = wx.TextCtrl(self, -1)
+		type_tc = wx.TextCtrl(self, -1)
+
+		search_subdir_cb = wx.CheckBox(self, -1, 'Search Sub Dirs')
+		case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
+		find_btn = wx.Button(self, label='Find Now!')
+
+		self.Bind(wx.EVT_BUTTON, self.onBrowse, brws_btn)
+		self.Bind(wx.EVT_BUTTON, self.onFind, find_btn)
 
 		argu_ui_box = wx.FlexGridSizer(rows=3, cols=3, hgap=5, vgap=5)
-		argu_ui_box.Add(set_co_b)
-		argu_ui_box.Add(set_sti_b)
-		argu_ui_box.Add(auto_search_b)
+		argu_ui_box.AddGrowableCol(1, 1)
+
+		argu_ui_box.AddMany([
+			(find_st), (hbox, 1, wx.EXPAND), (search_subdir_cb),
+			(name_st), (name_tc, 1, wx.EXPAND), (case_sensitive_cb),
+			(type_st), (type_tc, 1, wx.EXPAND), (find_btn) ])
 
 		return argu_ui_box
 

@@ -94,6 +94,11 @@ class MyFrame(wx.Frame):
 	def mypass(self, event):
 		pass
 
+	def createToolBar(self):
+		toolbar = self.CreateToolBar()
+		#toolbar.AddLabelTool(-1, '', wx.Bitmap('images/tux.png'))
+		toolbar.Realize()
+
 	def createStatusBar(self):
 		self.CreateStatusBar()
 		self.SetStatusText('Welcome to use NPyFind!')
@@ -101,10 +106,6 @@ class MyFrame(wx.Frame):
 	
 	def toolBarData(self):
 		pass
-
-	def createToolBar(self):
-		toolbar = self.CreateToolBar()
-		toolbar.Realize()
 
 	
 	def onAbout(self, event):
