@@ -6,19 +6,18 @@ import wx
 
 class MyListCtrl(wx.ListCtrl):
 	def __init__(self, parent, id):
-		wx.ListCtrl.__init__(self, parent, id, size=(600, 400), style=wx.LC_REPORT)
-		#wx.ListCtrl.__init__(self, parent, id, style=wx.LC_REPORT)
+		wx.ListCtrl.__init__(self, parent, id, style=wx.LC_REPORT)
 
 		self.InsertColumn(0, "Name")
-		self.InsertColumn(1, "Directory")
-		self.InsertColumn(2, "Size")
-		self.InsertColumn(3, "Date Modified")
+		self.InsertColumn(1, "Size")
+		self.InsertColumn(2, "Date Modified")
+		self.InsertColumn(3, "Directory")
 
 		self.SetColumnWidth(0, 160)
-		self.SetColumnWidth(1, 300)
-		self.SetColumnWidth(2, 80)
+		self.SetColumnWidth(1, 80)
+		self.SetColumnWidth(2, 160)
 		#self.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
-		self.SetColumnWidth(3, 120)
+		self.SetColumnWidth(3, 300)
 
 		self.set_value()
 
@@ -28,9 +27,9 @@ class MyListCtrl(wx.ListCtrl):
 		files = os.listdir('.')
 		for file in files:
 			self.InsertStringItem(row, os.path.basename(file))
-			self.SetStringItem(row, 1, os.getcwd() + os.path.dirname(file))
-			self.SetStringItem(row, 2, str(os.path.getsize(file)))
-			self.SetStringItem(row, 3, time.ctime(os.path.getmtime(file)))
+			self.SetStringItem(row, 1, str(os.path.getsize(file)))
+			self.SetStringItem(row, 2, time.ctime(os.path.getmtime(file)))
+			self.SetStringItem(row, 3, os.getcwd() + os.path.dirname(file))
 			row += 1
 
 
@@ -44,13 +43,14 @@ class pyMainPanel(wx.Panel):
 	
 	def create_widgets(self):
 		search_argu_box = self.config_argu_ui()
-		search_result_box = self.config_search_result()
+		#search_result_box = self.config_search_result()
+		mylist = MyListCtrl(self, -1)
 
 		mainbox = wx.BoxSizer(wx.VERTICAL)
 		mainbox.Add(search_argu_box, 0)
 		mainbox.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.TOP|wx.BOTTOM, 10)
-		#mainbox.Add(search_result_box, 0)
-		mainbox.Add(search_result_box, 1, wx.EXPAND)
+		#mainbox.Add(search_result_box, 1, wx.EXPAND)
+		mainbox.Add(mylist, 1, wx.EXPAND)
 
 		self.SetSizer(mainbox)
 		mainbox.Fit(self)
@@ -195,7 +195,7 @@ class testFrame(wx.Frame):
 
 class MyApp(wx.App):
 	def OnInit(self):
-		self.frame = testFrame(pos=(300,120), size=(500, 540))
+		self.frame = testFrame(pos=(300,120), size=(600, 400))
 		self.frame.Show()
 		self.SetTopWindow(self.frame)
 		return True

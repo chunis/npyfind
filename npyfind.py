@@ -24,7 +24,7 @@ class MyFrame(wx.Frame):
 	"Main frame for NPyFind"
 
 	def __init__(self, parent=None, id=-1, title='NPyFind',
-			pos=wx.DefaultPosition, size=(450,300)):
+			pos=wx.DefaultPosition, size=wx.DefaultSize):
 		wx.Frame.__init__(self, None, -1, title, pos, size)
 		self.panel = wx.Panel(self)
 		#self.panel.SetBackgroundColour('white')
@@ -45,14 +45,10 @@ class MyFrame(wx.Frame):
 		self.nb.AddPage(self.link_tools_frame, "Link Tools")
 
 		box = wx.BoxSizer(wx.HORIZONTAL)
-
-		#box.Add(self.direct_key_frame, 0, wx.ALL, 12)
-		#box.Add(self.function_frame, 0, wx.ALL, 12)
 		box.Add(self.nb, 1, wx.EXPAND)
 		self.panel.SetSizer(box)
-		box.Fit(self)
+		#box.Fit(self)
 
-		#self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
 	def menu_data(self):
 		return [ ("&File", (
@@ -95,16 +91,6 @@ class MyFrame(wx.Frame):
 		return menu
 
 
-	def add_tool_bar(self):
-		toolbar = self.CreateToolBar()
-		toolbar.Realize()
-
-		'''
-		button_close = wx.Button(self.panel, label='close', pos=(400,10))
-		self.Bind(wx.EVT_BUTTON, self.OnClose, button_close)
-		button_about = wx.Button(self.panel, label='About', pos=(20,0))
-		self.Bind(wx.EVT_BUTTON, self.OnAbout, button_about)
-		'''
 	def mypass(self, event):
 		pass
 
@@ -117,7 +103,8 @@ class MyFrame(wx.Frame):
 		pass
 
 	def createToolBar(self):
-		pass
+		toolbar = self.CreateToolBar()
+		toolbar.Realize()
 
 	
 	def onAbout(self, event):
@@ -142,13 +129,13 @@ class NPyFind(wx.App):
 	"Main App for NPyFind"
 
 	def OnInit(self):
-		self.frame = MyFrame(self)
+		self.frame = MyFrame(self, size=(700, 500))
+		self.frame.Center()
 		self.frame.Show()
 		self.SetTopWindow(self.frame)
 		return True
 
 #	thread.start_new(myprint, ())
-
 
 if __name__ == '__main__':
 	nPyFind = NPyFind(False)
