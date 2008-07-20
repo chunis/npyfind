@@ -2,11 +2,13 @@
 
 import sys, os, time
 import wx
+from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 
 
-class MyListCtrl(wx.ListCtrl):
+class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
 	def __init__(self, parent, id):
 		wx.ListCtrl.__init__(self, parent, id, style=wx.LC_REPORT)
+		ListCtrlAutoWidthMixin.__init__(self)
 
 		self.InsertColumn(0, "Name", width=160)
 		self.InsertColumn(1, "Size", format=wx.LIST_FORMAT_RIGHT, width=80)
@@ -51,8 +53,6 @@ class pyMainPanel(wx.Panel):
 	
 	def config_argu_ui(self):
 		find_st = wx.StaticText(self, label='Find Files In')
-		name_st = wx.StaticText(self, label='File Specification')
-		type_st = wx.StaticText(self, label='File Type')
 
 		dir_tc = wx.TextCtrl(self, -1)
 		brws_btn = wx.Button(self, label='Browse')
@@ -60,15 +60,22 @@ class pyMainPanel(wx.Panel):
 		hbox.Add(dir_tc, 1)
 		hbox.Add(brws_btn)
 
-		name_tc = wx.TextCtrl(self, -1)
-		type_tc = wx.TextCtrl(self, -1)
-
 		search_subdir_cb = wx.CheckBox(self, -1, 'Search Sub Dirs')
+		search_subdir_cb.SetValue(True)
+
+		name_st = wx.StaticText(self, label='File Specification')
+		name_tc = wx.TextCtrl(self, -1)
 		case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
+
+		type_st = wx.StaticText(self, label='File Type')
+		type_tc = wx.TextCtrl(self, -1)
 		find_btn = wx.Button(self, label='Find Now!')
+
 
 		self.Bind(wx.EVT_BUTTON, self.onBrowse, brws_btn)
 		self.Bind(wx.EVT_BUTTON, self.onFind, find_btn)
+		#self.Bind(wx.EVT_CHECKBOX, self.onSubdir, search_subdir_cb)
+		#self.Bind(wx.EVT_CHECKBOX, self.onCaseSen, case_sensitive_cb)
 
 		argu_ui_box = wx.FlexGridSizer(rows=3, cols=3, hgap=5, vgap=5)
 		argu_ui_box.AddGrowableCol(1, 1)
@@ -93,14 +100,24 @@ class pyMainPanel(wx.Panel):
 		wx.MessageBox('Sorry. Not implemented yet...', 
 				name, wx.OK | wx.ICON_INFORMATION, self)
 		
+	def onBrowse(self, event):	
+		dir = wx.DirDialog(None, "Choose a Directory:")
+		if dir.ShowModal() == wx.ID_OK:
+			self.searchdir = dir.GetPath()
+			print self.searchdir
+		dir.Destroy()
+
 	def onFind(self, event):	
 		self.onNotImplemented('Find')
 		
-	def onBrowse(self, event):	
-		self.onNotImplemented('Find')
-		
+	def onSubdir(self, event):	
+		self.onNotImplemented('Search Sub Dir')
+
+	def onCaseSen(self, event):	
+		self.onNotImplemented('Case Sensitive')
+
 	def onFilesType(self, event):	
-		self.onNotImplemented('Open Dir')
+		self.onNotImplemented('Files Type')
 
 	def onOpenDir(self, event):	
 		self.onNotImplemented('Open Dir')
