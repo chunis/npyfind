@@ -9,10 +9,14 @@ import glob
 def recu_find(path, file, recu):
 	tmp = [ ]
 	result = [ ]
-	os.chdir(path)
+
+	old_dir = os.getcwd()
+	new_dir = os.path.join(old_dir, path)
+	os.chdir(new_dir)
+	
 	books=glob.glob(file)
 	for book in books:
-		result.append(book)
+		result.append(os.path.join(new_dir, book))
 #		print book
 
 	if recu == 1:
@@ -20,10 +24,10 @@ def recu_find(path, file, recu):
 			if os.path.isdir(filepath):
 				tmp = recu_find(filepath, file, recu)
 
-	if tmp:
-		result.extend(tmp)
+	# if there are search result from sub dirs, add them
+	if tmp: result.extend(tmp)
 
-	os.chdir('..')
+	os.chdir(old_dir)
 	return result
 
 
@@ -37,17 +41,14 @@ class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
 		self.InsertColumn(2, "Date Modified", format=wx.LIST_FORMAT_RIGHT, width=160)
 		self.InsertColumn(3, "Directory", width=300)
 
-		self.set_value()
 
-
-	def set_value(self):
+	def set_value(self, files):
 		row = 0
-		files = os.listdir('.')
 		for file in files:
 			self.InsertStringItem(row, os.path.basename(file))
 			self.SetStringItem(row, 1, str(os.path.getsize(file)) + ' B')
 			self.SetStringItem(row, 2, time.ctime(os.path.getmtime(file)))
-			self.SetStringItem(row, 3, os.getcwd() + os.path.dirname(file))
+			self.SetStringItem(row, 3, os.path.dirname(file))
 			row += 1
 
 
@@ -61,12 +62,12 @@ class pyMainPanel(wx.Panel):
 	
 	def create_widgets(self):
 		search_argu_box = self.config_argu_ui()
-		mylist = MyListCtrl(self, -1)
+		self.mylist = MyListCtrl(self, -1)
 
 		mainbox = wx.BoxSizer(wx.VERTICAL)
 		mainbox.Add(search_argu_box, 0, wx.EXPAND)
 		mainbox.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.TOP|wx.BOTTOM, 10)
-		mainbox.Add(mylist, 1, wx.EXPAND)
+		mainbox.Add(self.mylist, 1, wx.EXPAND)
 
 		self.SetSizer(mainbox)
 		mainbox.Fit(self)
@@ -162,10 +163,10 @@ class pyMainPanel(wx.Panel):
 		print file_pattern
 
 		search_result = recu_find(tmpdir, file_pattern, subdir_flag)
-		for file in search_result:
-			print file
+		#for file in search_result: print file
+		self.mylist.set_value(search_result)
 
-		
+
 	def onSubdir(self, event):	
 		self.onNotImplemented('Search Sub Dir')
 
