@@ -54,18 +54,18 @@ class pyMainPanel(wx.Panel):
 	def config_argu_ui(self):
 		find_st = wx.StaticText(self, label='Find Files In')
 
-		dir_tc = wx.TextCtrl(self, -1)
+		self.dir_tc = wx.TextCtrl(self, -1)
 		brws_btn = wx.Button(self, label='Browse')
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
-		hbox.Add(dir_tc, 1)
+		hbox.Add(self.dir_tc, 1)
 		hbox.Add(brws_btn)
 
-		search_subdir_cb = wx.CheckBox(self, -1, 'Search Sub Dirs')
-		search_subdir_cb.SetValue(True)
+		self.search_subdir_cb = wx.CheckBox(self, -1, 'Search Sub Dirs')
+		self.search_subdir_cb.SetValue(True)
 
 		name_st = wx.StaticText(self, label='File Specification')
-		name_tc = wx.TextCtrl(self, -1)
-		case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
+		self.name_tc = wx.TextCtrl(self, -1)
+		self.case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
 
 		type_st = wx.StaticText(self, label='File Type')
 		type_tc = wx.TextCtrl(self, -1)
@@ -81,8 +81,8 @@ class pyMainPanel(wx.Panel):
 		argu_ui_box.AddGrowableCol(1, 1)
 
 		argu_ui_box.AddMany([
-			(find_st), (hbox, 1, wx.EXPAND), (search_subdir_cb),
-			(name_st), (name_tc, 1, wx.EXPAND), (case_sensitive_cb),
+			(find_st), (hbox, 1, wx.EXPAND), (self.search_subdir_cb),
+			(name_st), (self.name_tc, 1, wx.EXPAND), (self.case_sensitive_cb),
 			(type_st), (type_tc, 1, wx.EXPAND), (find_btn) ])
 
 		return argu_ui_box
@@ -104,11 +104,28 @@ class pyMainPanel(wx.Panel):
 		dir = wx.DirDialog(None, "Choose a Directory:")
 		if dir.ShowModal() == wx.ID_OK:
 			self.searchdir = dir.GetPath()
+			self.dir_tc.SetValue(self.searchdir)
 			print self.searchdir
 		dir.Destroy()
 
 	def onFind(self, event):	
-		self.onNotImplemented('Find')
+		subdir_flag = self.search_subdir_cb.GetValue()
+		case_flag = self.case_sensitive_cb.GetValue()
+		tmpdir = self.dir_tc.GetValue()
+		tmp_name_spec = self.name_tc.GetValue()
+
+		if not os.path.isdir(tmpdir):
+			wx.MessageBox('The Search Directory doesn\'t exist!\n'
+					'Please correct it first',
+					'Wrong Path', wx.OK | wx.ICON_INFORMATION, self)
+
+		if tmp_name_spec == '':
+			wx.MessageBox('Is the Name Specification Empty?',
+					'No Name Specification', wx.OK | wx.ICON_INFORMATION, self)
+
+		print subdir_flag, case_flag
+		print tmpdir, tmp_name_spec
+
 		
 	def onSubdir(self, event):	
 		self.onNotImplemented('Search Sub Dir')

@@ -77,36 +77,6 @@ def save_config(epath, etype, var, cfgfile):
 		cfg_file.close()
 
 
-'''
-def myopen(dirnames, file):
-	for dir in dirnames:
-		tmp_file = os.path.join(dir, file)
-		if os.path.exists(tmp_file):
-			os.startfile(tmp_file)
-			break
-
-
-def myopen_dir(dirnames, file):
-	for dir in dirnames:
-		tmp_file = os.path.join(dir, file)
-		if os.path.exists(tmp_file):
-			file_dir = os.path.dirname(tmp_file)
-			tmp_dir = os.getcwd()
-			os.chdir(file_dir)
-			os.startfile('.')
-			os.chdir(tmp_dir)
-
-
-def mycopy(dirnames, file):
-	for dir in dirnames:
-		tmp_file = os.path.join(dir, file)
-		if os.path.exists(tmp_file):
-			tmp_dir = askdirectory()
-#			print 'copy to: ' + tmp_dir
-			shutil.copy(tmp_file, tmp_dir)
-'''
-
-
 def recufind(path, allpath, file, result, find_flag):
 	if find_flag == False:
 		return

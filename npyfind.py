@@ -54,7 +54,7 @@ class MyFrame(wx.Frame):
 		return [ ("&File", (
 				("&Save Result", "Save Search Result", self.mypass),
 				("", "", ""),
-				("&Configure...", "Configure Search Options", self.mypass),
+				("C&onfigure...", "Configure Search Options", self.mypass),
 				("", "", ""),
 				("&Close", "Close this tool", self.onExit))),
 			 ("&Action", (
@@ -66,8 +66,8 @@ class MyFrame(wx.Frame):
 				("", "", ""),
 				("&Clear Result", "Clear Search Result", self.mypass))),
 			 ("&Help", (
-				("&About", "About this tool", self.onAbout),
-				("&Close", "Close this tool", self.onExit))) ]
+				("&Help Contents\tF1", "Help of this tool", self.onHelp),
+				("&About", "About this tool", self.onAbout))) ]
 
 
 	def createMenuBar(self):
@@ -108,6 +108,9 @@ class MyFrame(wx.Frame):
 		pass
 
 	
+	def onHelp(self, event):
+		wx.MessageBox('Sorry, No help yet', 'Help', wx.OK | wx.ICON_INFORMATION, self)
+
 	def onAbout(self, event):
 		about = pyfind_core.myabout(Name, Version, Date)
 		wx.MessageBox(about, 'About %s' %Name, wx.OK | wx.ICON_INFORMATION, self)
