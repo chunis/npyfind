@@ -66,9 +66,10 @@ class pyMainPanel(wx.Panel):
 		name_st = wx.StaticText(self, label='File Specification')
 		self.name_tc = wx.TextCtrl(self, -1)
 		self.case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
+		self.case_sensitive_cb.Disable()
 
 		type_st = wx.StaticText(self, label='File Type')
-		type_tc = wx.TextCtrl(self, -1)
+		self.type_tc = wx.TextCtrl(self, -1)
 		find_btn = wx.Button(self, label='Find Now!')
 
 
@@ -81,9 +82,17 @@ class pyMainPanel(wx.Panel):
 		argu_ui_box.AddGrowableCol(1, 1)
 
 		argu_ui_box.AddMany([
-			(find_st), (hbox, 1, wx.EXPAND), (self.search_subdir_cb),
-			(name_st), (self.name_tc, 1, wx.EXPAND), (self.case_sensitive_cb),
-			(type_st), (type_tc, 1, wx.EXPAND), (find_btn) ])
+			(find_st, 0, wx.ALIGN_RIGHT),
+			(hbox, 1, wx.EXPAND),
+			(self.search_subdir_cb),
+
+			(name_st, 0, wx.ALIGN_RIGHT),
+			(self.name_tc, 1, wx.EXPAND),
+			(self.case_sensitive_cb),
+
+			(type_st, 0, wx.ALIGN_RIGHT),
+			(self.type_tc, 1, wx.EXPAND),
+			(find_btn) ])
 
 		return argu_ui_box
 
@@ -113,6 +122,7 @@ class pyMainPanel(wx.Panel):
 		case_flag = self.case_sensitive_cb.GetValue()
 		tmpdir = self.dir_tc.GetValue()
 		tmp_name_spec = self.name_tc.GetValue()
+		tmp_file_type = self.type_tc.GetValue()
 
 		if not os.path.isdir(tmpdir):
 			wx.MessageBox('The Search Directory doesn\'t exist!\n'
@@ -124,7 +134,7 @@ class pyMainPanel(wx.Panel):
 					'No Name Specification', wx.OK | wx.ICON_INFORMATION, self)
 
 		print subdir_flag, case_flag
-		print tmpdir, tmp_name_spec
+		print tmpdir, tmp_name_spec, tmp_file_type
 
 		
 	def onSubdir(self, event):	
