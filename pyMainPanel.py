@@ -3,6 +3,28 @@
 import sys, os, time
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
+import glob
+
+
+def recu_find(path, file, recu):
+	tmp = [ ]
+	result = [ ]
+	os.chdir(path)
+	books=glob.glob(file)
+	for book in books:
+		result.append(book)
+#		print book
+
+	if recu == 1:
+		for filepath in os.listdir('.'):
+			if os.path.isdir(filepath):
+				tmp = recu_find(filepath, file, recu)
+
+	if tmp:
+		result.extend(tmp)
+
+	os.chdir('..')
+	return result
 
 
 class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
@@ -135,6 +157,13 @@ class pyMainPanel(wx.Panel):
 
 		print subdir_flag, case_flag
 		print tmpdir, tmp_name_spec, tmp_file_type
+		
+		file_pattern = '*' + tmp_name_spec + '*.' + tmp_file_type
+		print file_pattern
+
+		search_result = recu_find(tmpdir, file_pattern, subdir_flag)
+		for file in search_result:
+			print file
 
 		
 	def onSubdir(self, event):	
