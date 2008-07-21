@@ -64,6 +64,8 @@ class pyMainPanel(wx.Panel):
 		search_argu_box = self.config_argu_ui()
 		self.mylist = MyListCtrl(self, -1)
 
+		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onOpenItem, self.mylist)
+
 		mainbox = wx.BoxSizer(wx.VERTICAL)
 		mainbox.Add(search_argu_box, 0, wx.EXPAND)
 		mainbox.Add(wx.StaticLine(self), 0, wx.EXPAND|wx.TOP|wx.BOTTOM, 10)
@@ -118,6 +120,11 @@ class pyMainPanel(wx.Panel):
 			(find_btn) ])
 
 		return argu_ui_box
+
+
+	def onOpenItem(self, event):
+		item = event.GetItem()
+		print 'Selected %s' %item.GetText()
 
 
 	def mytest(self, parent):

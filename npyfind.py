@@ -1,22 +1,19 @@
 #!/usr/bin/python
 # -*- coding: gb2312 -*-
 
-# Name:   NPyFind
-# Author: Deng Chunhui
-# Email:  chunchengfh@gmail.com'
-
 "Another PyFind implemented by WxPython"
 
 import wx
 #import os, sys
 #import glob, shutil, thread
-import pyfind_core
 from pyMainPanel import pyMainPanel
 from pySketch import pySketch
 
 
 Name	= 'NPyFind'
 Version	= '0.0.1-dev'
+Author	= 'Deng Chunhui'
+Email	= 'chunchengfh@gmail.com'
 Date	= '2008.05.22'
 
 
@@ -112,7 +109,11 @@ class MyFrame(wx.Frame):
 		wx.MessageBox('Sorry, No help yet', 'Help', wx.OK | wx.ICON_INFORMATION, self)
 
 	def onAbout(self, event):
-		about = pyfind_core.myabout(Name, Version, Date)
+		about = (Name 	+ '\nThis is another PyFind implemented by WxPython'
+				+ '\n\nVersion: ' + Version
+				+ '\n Author: ' + Author 
+				+ '\n Email: ' + Email 
+				+ '\n Date:\t' + Date)
 		wx.MessageBox(about, 'About %s' %Name, wx.OK | wx.ICON_INFORMATION, self)
 
 	def onExit(self, event):	
