@@ -3,6 +3,7 @@
 import sys, os, time
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
+from wx.lib.mixins.listctrl import ColumnSorterMixin
 import glob
 
 
@@ -31,26 +32,34 @@ def recu_find(path, file, recu):
 	return result
 
 
-class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
+class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin, ColumnSorterMixin):
 	def __init__(self, parent, id):
 		wx.ListCtrl.__init__(self, parent, id, style=wx.LC_REPORT)
 		ListCtrlAutoWidthMixin.__init__(self)
+		ColumnSorterMixin.__init__(self, 6)
+		self.itemDataMap = {}
 
 		self.InsertColumn(0, "Name", width=160)
 		self.InsertColumn(1, "Size", format=wx.LIST_FORMAT_RIGHT, width=80)
 		self.InsertColumn(2, "Date Modified", format=wx.LIST_FORMAT_RIGHT, width=160)
 		self.InsertColumn(3, "Directory", width=300)
 
+	def GetListCtrl(self):
+		return self
 
 	def set_value(self, files):
-		row = 0
 		for file in files:
-			self.InsertStringItem(row, os.path.basename(file))
-			self.SetStringItem(row, 1, str(os.path.getsize(file)) + ' B')
-			self.SetStringItem(row, 2, time.ctime(os.path.getmtime(file)))
-			self.SetStringItem(row, 3, os.path.dirname(file))
-			row += 1
+			name = os.path.basename(file)
+			size = str(os.path.getsize(file)) + ' B'
+			ctime = time.ctime(os.path.getmtime(file))
+			dir = os.path.dirname(file)
 
+			item = (name, size, ctime, dir)
+			index = self.InsertStringItem(sys.maxint, item[0])
+			for col, text in enumerate(item[1:]):
+				self.SetStringItem(index, col+1, text)
+			self.SetItemData(index, index)
+			self.itemDataMap[index] = item
 
 
 class pyMainPanel(wx.Panel):
@@ -79,7 +88,8 @@ class pyMainPanel(wx.Panel):
 	def config_argu_ui(self):
 		find_st = wx.StaticText(self, label='Find Files In')
 
-		self.dir_tc = wx.TextCtrl(self, -1)
+		#self.dir_tc = wx.TextCtrl(self, -1)
+		self.dir_tc = wx.TextCtrl(self, -1, value='/home/denny/sunny/books')
 		brws_btn = wx.Button(self, label='Browse')
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		hbox.Add(self.dir_tc, 1)
@@ -89,12 +99,14 @@ class pyMainPanel(wx.Panel):
 		self.search_subdir_cb.SetValue(True)
 
 		name_st = wx.StaticText(self, label='File Specification')
-		self.name_tc = wx.TextCtrl(self, -1)
+		#self.name_tc = wx.TextCtrl(self, -1)
+		self.name_tc = wx.TextCtrl(self, -1, value='ython')
 		self.case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
 		self.case_sensitive_cb.Disable()
 
 		type_st = wx.StaticText(self, label='File Type')
-		self.type_tc = wx.TextCtrl(self, -1)
+		#self.type_tc = wx.TextCtrl(self, -1)
+		self.type_tc = wx.TextCtrl(self, -1, value='*')
 		find_btn = wx.Button(self, label='Find Now!')
 
 
