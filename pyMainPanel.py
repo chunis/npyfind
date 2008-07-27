@@ -1,10 +1,13 @@
 #!/usr/bin/python
 
 import sys, os, time
+import glob
+
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.mixins.listctrl import ColumnSorterMixin
-import glob
+
+import tool
 
 
 def recu_find(path, file, recu):
@@ -64,6 +67,14 @@ class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin, ColumnSorterMixin):
 
 class pyMainPanel(wx.Panel):
 	def __init__(self, parent=None, id=-1):
+		self.select = 0
+
+		self.open_file_id = wx.NewId()
+		self.open_dir_id = wx.NewId()
+		self.clear_id = wx.NewId()
+		self.copy_id = wx.NewId()
+		self.move_id = wx.NewId()
+
 		wx.Panel.__init__(self, parent, id)
 		#self.SetBackgroundColour('White')
 		self.create_widgets()
@@ -74,6 +85,13 @@ class pyMainPanel(wx.Panel):
 		self.mylist = MyListCtrl(self, -1)
 
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onOpenItem, self.mylist)
+		#self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onRightClick, self.mylist)
+		#self.Bind(wx.EVT_CONTEXT_MENU, self.onRightClick)#, self.mylist)
+		self.Bind(wx.EVT_CONTEXT_MENU, self.onRightClick, self.mylist)
+		#self.mylist.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onRightClick)#, self.mylist)
+
+		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelected, self.mylist)
+		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onItemDeselected, self.mylist)
 
 		mainbox = wx.BoxSizer(wx.VERTICAL)
 		mainbox.Add(search_argu_box, 0, wx.EXPAND)
@@ -134,9 +152,49 @@ class pyMainPanel(wx.Panel):
 		return argu_ui_box
 
 
+	def onRightClick(self, event):
+		print 'Right click now...'
+		menu = wx.Menu()
+
+		if tool.OPEN_FILE_FLAG == 1:
+			menu.Append(self.open_file_id, "Open")
+			self.Bind(wx.EVT_MENU, self.onOpenItem, id = self.open_file_id)
+
+		if tool.OPEN_DIR_FLAG == 1:
+			menu.Append(self.open_dir_id, "Open Directory")
+			self.Bind(wx.EVT_MENU, self.onOpenDir, id = self.open_dir_id)
+
+		menu.Append(self.clear_id, "Clean Search Result")
+		menu.Append(self.copy_id, "Copy to...")
+		menu.Append(self.move_id, "Move to...")
+
+		self.Bind(wx.EVT_MENU, self.onClearResult, id = self.clear_id)
+		self.Bind(wx.EVT_MENU, self.onCopy, id = self.copy_id)
+		self.Bind(wx.EVT_MENU, self.onMove, id = self.move_id)
+
+		self.PopupMenu(menu)
+		menu.Destroy()
+
+
+	def onItemSelected(self, event):
+		self.select = event.GetIndex()
+		print 'self.select:',
+		print self.select
+
+	def onItemDeselected(self, event):
+		#self.select = event.GetIndex
+		pass
+
 	def onOpenItem(self, event):
-		item = event.GetItem()
-		print 'Selected %s' %item.GetText()
+		DIR_COL = 3
+
+		#index = event.GetIndex()
+		index = self.select
+		name = self.mylist.GetItem(index).GetText()
+		dir = self.mylist.GetItem(index, DIR_COL).GetText()
+		print 'Selected %s' %(os.path.join(dir, name))
+		file = os.path.join(dir, name)
+		tool.openfile(file)
 
 
 	def mytest(self, parent):
@@ -170,10 +228,12 @@ class pyMainPanel(wx.Panel):
 			wx.MessageBox('The Search Directory doesn\'t exist!\n'
 					'Please correct it first',
 					'Wrong Path', wx.OK | wx.ICON_INFORMATION, self)
+			return
 
 		if tmp_name_spec == '':
 			wx.MessageBox('Is the Name Specification Empty?',
 					'No Name Specification', wx.OK | wx.ICON_INFORMATION, self)
+			return
 
 		print subdir_flag, case_flag
 		print tmpdir, tmp_name_spec, tmp_file_type
@@ -197,6 +257,15 @@ class pyMainPanel(wx.Panel):
 
 	def onOpenDir(self, event):	
 		self.onNotImplemented('Open Dir')
+
+	def onClearResult(self, event):
+		self.mylist.DeleteAllItems()
+
+	def onCopy(self, event):
+		self.onNotImplemented('Copy')
+
+	def onMove(self, event):
+		self.onNotImplemented('Move')
 
 
 class testFrame(wx.Frame):

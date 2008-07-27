@@ -61,7 +61,7 @@ class MyFrame(wx.Frame):
 				("&Copy To", "Copy Selected Files to Another Place", self.mypass),
 				("&Delete", "Delete Selected Files", self.mypass),
 				("", "", ""),
-				("&Clear Result", "Clear Search Result", self.mypass))),
+				("&Clear Result\tctrl-q", "Clear Search Result", self.onClearResult))),
 			 ("&Help", (
 				("&Help Contents\tF1", "Help of this tool", self.onHelp),
 				("&About", "About this tool", self.onAbout))) ]
@@ -105,6 +105,10 @@ class MyFrame(wx.Frame):
 		pass
 
 	
+	def onClearResult(self, event):
+		self.main_panel_frame.onClearResult(event)
+
+
 	def onHelp(self, event):
 		wx.MessageBox('Sorry, No help yet', 'Help', wx.OK | wx.ICON_INFORMATION, self)
 
