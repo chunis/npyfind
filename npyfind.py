@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: gb2312 -*-
+# -*- coding: utf-8 -*-
 
 "Another PyFind implemented by WxPython"
 
@@ -94,6 +94,8 @@ class MyFrame(wx.Frame):
 	def createToolBar(self):
 		toolbar = self.CreateToolBar()
 		#toolbar.AddLabelTool(-1, '', wx.Bitmap('images/tux.png'))
+		toolbar.AddLabelTool(-1, '', wx.Bitmap('images/find.png'))
+		#toolbar.AddLabelTool(-1, '', wx.Bitmap('images/configure.png'))
 		toolbar.Realize()
 
 	def createStatusBar(self):

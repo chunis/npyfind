@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- codeing: utf-8 -*-
 
 import sys, os, time
 import glob
@@ -10,12 +11,16 @@ from wx.lib.mixins.listctrl import ColumnSorterMixin
 import tool
 
 
+DIR_COL = 3
+
 def recu_find(path, file, recu):
 	tmp = [ ]
 	result = [ ]
 
 	old_dir = os.getcwd()
 	new_dir = os.path.join(old_dir, path)
+#	print file
+#	print 'new_dir', new_dir
 	os.chdir(new_dir)
 	
 	books=glob.glob(file)
@@ -28,8 +33,8 @@ def recu_find(path, file, recu):
 			if os.path.isdir(filepath):
 				tmp = recu_find(filepath, file, recu)
 
-	# if there are search result from sub dirs, add them
-	if tmp: result.extend(tmp)
+				# if there are search result from sub dirs, add them
+				if tmp: result.extend(tmp)
 
 	os.chdir(old_dir)
 	return result
@@ -42,10 +47,10 @@ class MyListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin, ColumnSorterMixin):
 		ColumnSorterMixin.__init__(self, 6)
 		self.itemDataMap = {}
 
-		self.InsertColumn(0, "Name", width=160)
+		self.InsertColumn(0, "Name", width=220)
 		self.InsertColumn(1, "Size", format=wx.LIST_FORMAT_RIGHT, width=80)
 		self.InsertColumn(2, "Date Modified", format=wx.LIST_FORMAT_RIGHT, width=160)
-		self.InsertColumn(3, "Directory", width=300)
+		self.InsertColumn(3, "Directory", width=240)
 
 	def GetListCtrl(self):
 		return self
@@ -107,6 +112,7 @@ class pyMainPanel(wx.Panel):
 		find_st = wx.StaticText(self, label='Find Files In')
 
 		#self.dir_tc = wx.TextCtrl(self, -1)
+		#self.dir_tc = wx.TextCtrl(self, -1, value='/home/denny/workstation/npyfind')
 		self.dir_tc = wx.TextCtrl(self, -1, value='/home/denny/sunny/books')
 		brws_btn = wx.Button(self, label='Browse')
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -186,8 +192,6 @@ class pyMainPanel(wx.Panel):
 		pass
 
 	def onOpenItem(self, event):
-		DIR_COL = 3
-
 		#index = event.GetIndex()
 		index = self.select
 		name = self.mylist.GetItem(index).GetText()
@@ -256,16 +260,53 @@ class pyMainPanel(wx.Panel):
 		self.onNotImplemented('Files Type')
 
 	def onOpenDir(self, event):	
-		self.onNotImplemented('Open Dir')
+		#index = event.GetIndex()
+		index = self.select
+		dir = self.mylist.GetItem(index, DIR_COL).GetText()
+		tool.openfile(dir)
+
 
 	def onClearResult(self, event):
 		self.mylist.DeleteAllItems()
 
+
+	def prepareCopyOrMove(self, event, string, func):
+		#index = event.GetIndex()
+		index = self.select
+		name = self.mylist.GetItem(index).GetText()
+		dir = self.mylist.GetItem(index, DIR_COL).GetText()
+		print 'Selected %s' %(os.path.join(dir, name))
+		file = os.path.join(dir, name)
+
+		dir = wx.DirDialog(None, string)
+		if dir.ShowModal() == wx.ID_OK:
+			dest_path = dir.GetPath()
+		dir.Destroy()
+
+		# Test if it will overwrite existed file
+		tmp_file = os.path.join(dest_path, name)
+		if os.path.exists(tmp_file):
+			dlg = wx.MessageDialog(None, '%s already exist!\n'
+				'Do you want to overwrite it?' %tmp_file, 
+				'File exist',
+				wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+			retcode = dlg.ShowModal()
+			dlg.Destroy()
+
+			if retcode == wx.ID_NO:
+				return
+
+		func(file, dest_path)
+
+
 	def onCopy(self, event):
-		self.onNotImplemented('Copy')
+		self.prepareCopyOrMove(event, "Copy File To...", tool.copyfile)
+
 
 	def onMove(self, event):
-		self.onNotImplemented('Move')
+		self.prepareCopyOrMove(event, "Move File To...", tool.movefile)
+		# TODO
+		# if moved, update that file's new status
 
 
 class testFrame(wx.Frame):
