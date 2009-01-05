@@ -19,14 +19,15 @@ def recu_find(path, file, recu):
 
 	old_dir = os.getcwd()
 	new_dir = os.path.join(old_dir, path)
-#	print file
-#	print 'new_dir', new_dir
+	#print 'file: ', repr(file)  # for debug
+	#print 'new_dir: ', new_dir
 	os.chdir(new_dir)
 	
-	books=glob.glob(file)
+	books=glob.glob(file.encode('utf-8'))
 	for book in books:
 		result.append(os.path.join(new_dir, book))
-#		print book
+		#print book
+		#print 'book: ', repr(book)  # for debug
 
 	if recu == 1:
 		for filepath in os.listdir('.'):
