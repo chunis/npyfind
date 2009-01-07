@@ -61,7 +61,7 @@ class MyFrame(wx.Frame):
 				("&Copy To", "Copy Selected Files to Another Place", self.mypass),
 				("&Delete", "Delete Selected Files", self.mypass),
 				("", "", ""),
-				("&Clear Result\tctrl-q", "Clear Search Result", self.onClearResult))),
+				("&Clear Result\tCTRL-Q", "Clear Search Result", self.onClearResult))),
 			 ("&Help", (
 				("&Help Contents\tF1", "Help of this tool", self.onHelp),
 				("&About", "About this tool", self.onAbout))) ]

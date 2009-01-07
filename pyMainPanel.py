@@ -12,6 +12,56 @@ import tool
 
 
 DIR_COL = 3
+SAVE_MAX = 8
+
+dir_cmb_list = []
+name_cmb_list = []
+type_cmb_list = ['*', 'chm', 'pdf']
+
+def fix_number_insert(alist, element, number=SAVE_MAX, left=0):
+	'''
+	Insert element to the head of alist.
+	If the list has more than number elements, trancate it.
+	last left element will be kept.
+	'''
+	if len(alist) >= number:
+		if(number > left):
+			del alist[number-left : -left]
+		else:
+			del alist[0 : -number]
+
+	if element in alist:
+		alist.remove(element)
+	else:
+		if len(alist) == number:
+			#print alist[number-left-1]
+			del alist[number-left-1]
+	alist.insert(0, element)
+	
+
+def combobox_value_insert(acombobox, value='', number=SAVE_MAX, left=0):
+	'''
+	Insert value to the head of combobox's choices list.
+	If it has more than number elements, trancate it.
+	last left element will be kept.
+	'''
+	if value == '':
+		acombobox.SetValue('')
+		return
+
+	cmb_count = acombobox.GetCount() - number
+	while cmb_count > 0:
+		acombobox.Delete(number-left)
+		cmb_count -= 1
+
+	find = acombobox.FindString(value)
+	if find != wx.NOT_FOUND:
+		acombobox.Delete(find)
+	elif cmb_count == 0:	# now acombobox has exactly number elements
+		acombobox.Delete(number-left-1)
+	acombobox.Insert(value, 0)
+	acombobox.SetValue(value)
+
 
 def recu_find(path, file, recu):
 	tmp = [ ]
@@ -19,19 +69,22 @@ def recu_find(path, file, recu):
 
 	old_dir = os.getcwd()
 	new_dir = os.path.join(old_dir, path)
-	#print 'file: ', repr(file)  # for debug
-	#print 'new_dir: ', new_dir
+	#print 'repr(path):', repr(path)
+	#print 'repr(old dir):', repr(old_dir)
+	#print 'repr(new_dir):', repr(new_dir)
+
 	os.chdir(new_dir)
 	
 	books=glob.glob(file.encode('utf-8'))
 	for book in books:
+		#result.append(os.path.join(new_dir, book.encode('gbk')))
 		result.append(os.path.join(new_dir, book))
-		#print book
-		#print 'book: ', repr(book)  # for debug
+		print 'book: ', repr(book)
 
 	if recu == 1:
 		for filepath in os.listdir('.'):
 			if os.path.isdir(filepath):
+				#print 'repr(filepath):', repr(filepath)
 				tmp = recu_find(filepath, file, recu)
 
 				# if there are search result from sub dirs, add them
@@ -111,27 +164,29 @@ class pyMainPanel(wx.Panel):
 	
 	def config_argu_ui(self):
 		find_st = wx.StaticText(self, label='Find Files In')
-
-		#self.dir_tc = wx.TextCtrl(self, -1)
-		#self.dir_tc = wx.TextCtrl(self, -1, value='/home/denny/workstation/npyfind')
-		self.dir_tc = wx.TextCtrl(self, -1, value='/home/denny/sunny/books')
-		brws_btn = wx.Button(self, label='Browse')
+		self.dir_cmb = wx.ComboBox(self, -1, os.getcwd(),
+						wx.DefaultPosition, 
+						wx.DefaultSize,
+						dir_cmb_list, wx.CB_DROPDOWN)
+		brws_btn = wx.Button(self, label='Browse...')
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
-		hbox.Add(self.dir_tc, 1)
+		hbox.Add(self.dir_cmb, 1)
 		hbox.Add(brws_btn)
 
 		self.search_subdir_cb = wx.CheckBox(self, -1, 'Search Sub Dirs')
 		self.search_subdir_cb.SetValue(True)
 
 		name_st = wx.StaticText(self, label='File Specification')
-		#self.name_tc = wx.TextCtrl(self, -1)
-		self.name_tc = wx.TextCtrl(self, -1, value='ython')
+		self.name_cmb = wx.ComboBox(self, -1, '', wx.DefaultPosition, 
+						wx.DefaultSize, name_cmb_list,
+						wx.CB_DROPDOWN)
 		self.case_sensitive_cb = wx.CheckBox(self, -1, 'Case Sensitive')
 		self.case_sensitive_cb.Disable()
 
 		type_st = wx.StaticText(self, label='File Type')
-		#self.type_tc = wx.TextCtrl(self, -1)
-		self.type_tc = wx.TextCtrl(self, -1, value='*')
+		self.type_cmb = wx.ComboBox(self, -1, '*', wx.DefaultPosition, 
+						wx.DefaultSize, type_cmb_list,
+						wx.CB_DROPDOWN)
 		find_btn = wx.Button(self, label='Find Now!')
 
 
@@ -149,18 +204,18 @@ class pyMainPanel(wx.Panel):
 			(self.search_subdir_cb),
 
 			(name_st, 0, wx.ALIGN_RIGHT),
-			(self.name_tc, 1, wx.EXPAND),
+			(self.name_cmb, 1, wx.EXPAND),
 			(self.case_sensitive_cb),
 
 			(type_st, 0, wx.ALIGN_RIGHT),
-			(self.type_tc, 1, wx.EXPAND),
+			(self.type_cmb, 1, wx.EXPAND),
 			(find_btn) ])
 
 		return argu_ui_box
 
 
 	def onRightClick(self, event):
-		print 'Right click now...'
+		#print 'Right click now...'
 		menu = wx.Menu()
 
 		if tool.OPEN_FILE_FLAG == 1:
@@ -185,8 +240,7 @@ class pyMainPanel(wx.Panel):
 
 	def onItemSelected(self, event):
 		self.select = event.GetIndex()
-		print 'self.select:',
-		print self.select
+		#print 'self.select:', self.select
 
 	def onItemDeselected(self, event):
 		#self.select = event.GetIndex
@@ -218,16 +272,15 @@ class pyMainPanel(wx.Panel):
 		dir = wx.DirDialog(None, "Choose a Directory:")
 		if dir.ShowModal() == wx.ID_OK:
 			self.searchdir = dir.GetPath()
-			self.dir_tc.SetValue(self.searchdir)
-			print self.searchdir
+			self.dir_cmb.SetValue(self.searchdir)
 		dir.Destroy()
 
 	def onFind(self, event):	
 		subdir_flag = self.search_subdir_cb.GetValue()
 		case_flag = self.case_sensitive_cb.GetValue()
-		tmpdir = self.dir_tc.GetValue()
-		tmp_name_spec = self.name_tc.GetValue()
-		tmp_file_type = self.type_tc.GetValue()
+		tmpdir = self.dir_cmb.GetValue()
+		tmp_name_spec = self.name_cmb.GetValue()
+		tmp_file_type = self.type_cmb.GetValue()
 
 		if not os.path.isdir(tmpdir):
 			wx.MessageBox('The Search Directory doesn\'t exist!\n'
@@ -240,11 +293,19 @@ class pyMainPanel(wx.Panel):
 					'No Name Specification', wx.OK | wx.ICON_INFORMATION, self)
 			return
 
-		print subdir_flag, case_flag
-		print tmpdir, tmp_name_spec, tmp_file_type
+		fix_number_insert(dir_cmb_list, tmpdir)
+		fix_number_insert(name_cmb_list, tmp_name_spec)
+		fix_number_insert(type_cmb_list, tmp_file_type, left=5)
+
+		combobox_value_insert(self.dir_cmb, tmpdir)
+		combobox_value_insert(self.name_cmb, tmp_name_spec)
+		combobox_value_insert(self.type_cmb, tmp_file_type, left=5)
+		
+		#print subdir_flag, case_flag
+		#print tmpdir, tmp_name_spec, tmp_file_type
 		
 		file_pattern = '*' + tmp_name_spec + '*.' + tmp_file_type
-		print file_pattern
+		#print file_pattern
 
 		search_result = recu_find(tmpdir, file_pattern, subdir_flag)
 		#for file in search_result: print file
