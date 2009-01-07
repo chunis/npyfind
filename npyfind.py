@@ -6,7 +6,7 @@
 import wx
 #import os, sys
 #import glob, shutil, thread
-from pyMainPanel import pyMainPanel
+from pyMainPanel import pyMainPanel, save_config, restore_config
 from pySketch import pySketch
 
 
@@ -123,6 +123,7 @@ class MyFrame(wx.Frame):
 		wx.MessageBox(about, 'About %s' %Name, wx.OK | wx.ICON_INFORMATION, self)
 
 	def onExit(self, event):	
+		save_config()
 		self.Close()
 		
 		
@@ -131,6 +132,7 @@ class NPyFind(wx.App):
 	"Main App for NPyFind"
 
 	def OnInit(self):
+		restore_config()
 		self.frame = MyFrame(self, size=(700, 500))
 		self.frame.Center()
 		self.frame.Show()

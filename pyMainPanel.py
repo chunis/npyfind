@@ -3,6 +3,7 @@
 
 import sys, os, time
 import glob
+import cPickle
 
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
@@ -13,10 +14,34 @@ import tool
 
 DIR_COL = 3
 SAVE_MAX = 8
+CONFIG_FILE = 'npyfind.cfg'
 
 dir_cmb_list = []
 name_cmb_list = []
 type_cmb_list = ['*', 'chm', 'pdf']
+
+def save_config(file=CONFIG_FILE):
+	cfg_list = [dir_cmb_list, name_cmb_list, type_cmb_list]
+	try:
+		output = open(file, 'wb')
+		cPickle.dump(cfg_list, output, -1)
+		output.close()
+	except:
+		pass
+
+def restore_config(file=CONFIG_FILE):
+	try:
+		input = open(file, 'rb')
+		mylist = cPickle.load(input)
+		input.close()
+
+		global dir_cmb_list, name_cmb_list, type_cmb_list
+		dir_cmb_list = mylist[0]
+		name_cmb_list = mylist[1]
+		type_cmb_list = mylist[2]
+	except:
+		pass
+
 
 def fix_number_insert(alist, element, number=SAVE_MAX, left=0):
 	'''
@@ -75,11 +100,16 @@ def recu_find(path, file, recu):
 
 	os.chdir(new_dir)
 	
-	books=glob.glob(file.encode('utf-8'))
+	if sys.platform == 'linux2':
+		books=glob.glob(file.encode('utf-8'))
+	else:
+		books=glob.glob(file)  # windows
 	for book in books:
-		#result.append(os.path.join(new_dir, book.encode('gbk')))
-		result.append(os.path.join(new_dir, book))
 		print 'book: ', repr(book)
+		if sys.platform == 'linux2':
+			result.append(os.path.join(new_dir, book))
+		else:	# windows
+			result.append(os.path.join(new_dir, book.encode('gbk')))
 
 	if recu == 1:
 		for filepath in os.listdir('.'):
@@ -306,6 +336,9 @@ class pyMainPanel(wx.Panel):
 		
 		file_pattern = '*' + tmp_name_spec + '*.' + tmp_file_type
 		#print file_pattern
+
+		if sys.platform == 'linux2':
+			tmpdir = tmpdir.encode('utf8')
 
 		search_result = recu_find(tmpdir, file_pattern, subdir_flag)
 		#for file in search_result: print file
