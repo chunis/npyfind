@@ -176,7 +176,7 @@ class pyMainPanel(wx.Panel):
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onOpenItem, self.mylist)
 		#self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onRightClick, self.mylist)
 		#self.Bind(wx.EVT_CONTEXT_MENU, self.onRightClick)#, self.mylist)
-		self.Bind(wx.EVT_CONTEXT_MENU, self.onRightClick, self.mylist)
+		self.mylist.Bind(wx.EVT_CONTEXT_MENU, self.onRightClick)
 		#self.mylist.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onRightClick)#, self.mylist)
 
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelected, self.mylist)
