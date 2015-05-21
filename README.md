@@ -10,11 +10,12 @@ or move it to somewhere else, or delete it.
 
 All wrote in *Python/WxPython*, This tool in fact is the successor of
 **[PyFind](https://github.com/chunis/pyfind)**,
-but a precursor of these projects:
+but precursor of
 **[SPyFind](https://github.com/chunis/spyfind)**
-**[BookMate](https://github.com/chunis/bookmate)**
+and
+**[BookMate](https://github.com/chunis/bookmate)**.
 
 **Note:**
-**This project is far from complete, and very likely won't be continued.**
+*This project is far from complete, and very likely won't be continued.*
 All functions should be found in **bookmate**. This code exists just for
 keeping its development history, and as an (ugly) reference code base.
