@@ -44,7 +44,7 @@ class MyFrame(wx.Frame):
 		box = wx.BoxSizer(wx.HORIZONTAL)
 		box.Add(self.nb, 1, wx.EXPAND)
 		self.panel.SetSizer(box)
-		#box.Fit(self)
+		box.Fit(self)
 
 
 	def menu_data(self):
